@@ -1,6 +1,4 @@
-node_modules
-typechain
-typechain-types
+
 #Hardhat files
 cache
 artifacts
@@ -8,6 +6,8 @@ artifacts
 # Compiler files
 cache/
 out/
+node_modules
+
 
 # Ignores development broadcast logs
 !/broadcast
@@ -17,6 +17,8 @@ out/
 #Hardhat files
 cache
 artifacts
+typechain
+typechain-types
 
 
 # Dotenv file
