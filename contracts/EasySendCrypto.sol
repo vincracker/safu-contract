@@ -18,7 +18,7 @@ struct Order {
     uint256 swap_deadline;
 }
 
-contract EasySendCrypto is AccessControl {
+contract EasySendCrypto is Initializable, AccessControlUpgradeable {
     uint256 public count;
     uint256 public fee_rate;
     address public fee_collect_address;
@@ -46,27 +46,31 @@ contract EasySendCrypto is AccessControl {
         _;
     }
 
-    constructor(uint256 _fee_rate, address _fee_collect_address) {
-        count = 0;
-        fee_rate = _fee_rate;
-        fee_collect_address = _fee_collect_address;
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    }
-
-    // function initialize(uint256 _fee_rate, address _fee_collect_address)
-    //     public
-    //     initializer
-    // {
-    //     __AccessControl_init();
-    //     __Context_init();
-    //     __ERC165_init();
-
+    // constructor(uint256 _fee_rate, address _fee_collect_address) {
     //     count = 0;
     //     fee_rate = _fee_rate;
     //     fee_collect_address = _fee_collect_address;
-
     //     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     // }
+
+    //     constructor() {
+    //     _disableInitializers();
+    // }
+
+    function initialize(uint256 _fee_rate, address _fee_collect_address)
+        public
+        initializer
+    {
+        __AccessControl_init();
+        __Context_init();
+        __ERC165_init();
+
+        count = 0;
+        fee_rate = _fee_rate;
+        fee_collect_address = _fee_collect_address;
+
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
 
     function set_fee_rate(uint256 _new_fee_rate) external onlyAdmin {
         fee_rate = _new_fee_rate;
@@ -140,6 +144,7 @@ contract EasySendCrypto is AccessControl {
 
     function claim_asset(bytes32 passphrase) external {
         Order memory unclaimed_order = orders_mapping[passphrase];
+        require(unclaimed_order.receiver != address(0), "Passphrase not exist");
         require(unclaimed_order.receiver == msg.sender, "Address not receiver");
         // require(unclaimed_order.is_swap == false, "Can only swap");
 
@@ -160,7 +165,7 @@ contract EasySendCrypto is AccessControl {
 
             _transfer_token_from(
                 payable(msg.sender),
-                unclaimed_order.receiver,
+                unclaimed_order.sender,
                 unclaimed_order.swap_amount - swap_collect_fee,
                 unclaimed_order.swap_token_address
             );
@@ -199,17 +204,17 @@ contract EasySendCrypto is AccessControl {
         delete orders_mapping[passphrase];
     }
 
-    // function is_passphrase_unique(bytes32 passphrase)
-    //     external
-    //     view
-    //     returns (bool)
-    // {
-    //     if (phrase_mapping[passphrase].sender == address(0)) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+    function is_passphrase_unique(bytes32 passphrase)
+        external
+        view
+        returns (bool)
+    {
+        if (orders_mapping[passphrase].sender == address(0)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     function _transfer_token_from(
         address from,
