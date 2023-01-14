@@ -142,7 +142,8 @@ contract EasySendCrypto is Initializable, AccessControlUpgradeable {
         );
     }
 
-    function claim_asset(bytes32 passphrase) external {
+    function claim_asset(string memory passphrase_string) external {
+        bytes32 passphrase = keccak256(abi.encodePacked(passphrase_string));
         Order memory unclaimed_order = orders_mapping[passphrase];
         require(unclaimed_order.receiver != address(0), "Passphrase not exist");
         require(unclaimed_order.receiver == msg.sender, "Address not receiver");
