@@ -54,12 +54,15 @@ contract EasySendCryptoTest is Test {
         uint256 test_wallet_2_balance = test_wallet_2.balance;
         uint256 fee_collect_addr_balance = fee_collect_address.balance;
 
+        string memory pp_string = "test";
+        bytes32 pp = keccak256(abi.encodePacked(pp_string));
+
         vm.prank(test_wallet_1);
         vm.expectRevert("Amount and value not match");
         easySendCrypto.add_order{value: 0.5 ether}(
             address(0),
             1 ether,
-            bytes32(uint256(100)),
+            pp,
             test_wallet_2,
             false,
             address(0),
@@ -72,7 +75,7 @@ contract EasySendCryptoTest is Test {
         easySendCrypto.add_order{value: 1 ether}(
             address(0),
             1 ether,
-            bytes32(uint256(100)),
+            pp,
             test_wallet_2,
             false,
             address(0),
@@ -85,14 +88,14 @@ contract EasySendCryptoTest is Test {
 
         vm.prank(address(this));
         vm.expectRevert("Address not receiver");
-        easySendCrypto.claim_asset(bytes32(uint256(100)));
+        easySendCrypto.claim_asset(pp_string);
 
         vm.prank(test_wallet_2);
         vm.expectRevert("Passphrase not exist");
-        easySendCrypto.claim_asset(bytes32(uint256(50)));
+        easySendCrypto.claim_asset("test2");
 
         vm.prank(test_wallet_2);
-        easySendCrypto.claim_asset(bytes32(uint256(100)));
+        easySendCrypto.claim_asset(pp_string);
 
         assertEq(
             test_wallet_2.balance - test_wallet_2_balance,
@@ -114,6 +117,9 @@ contract EasySendCryptoTest is Test {
         vm.prank(test_wallet_2);
         testERC20.approve(address(easySendCrypto), 1e18);
 
+        string memory pp_string = "test";
+        bytes32 pp = keccak256(abi.encodePacked(pp_string));
+
         uint256 test_wallet_1_eth_balance = test_wallet_1.balance;
         uint256 test_wallet_2_eth_balance = test_wallet_2.balance;
         uint256 fee_collect_addr_eth_balance = fee_collect_address.balance;
@@ -133,7 +139,7 @@ contract EasySendCryptoTest is Test {
         easySendCrypto.add_order{value: 1 ether}(
             address(0),
             1 ether,
-            bytes32(uint256(100)),
+            pp,
             test_wallet_2,
             true,
             address(testERC20),
@@ -146,21 +152,21 @@ contract EasySendCryptoTest is Test {
 
         vm.prank(address(this));
         vm.expectRevert("Address not receiver");
-        easySendCrypto.claim_asset(bytes32(uint256(100)));
+        easySendCrypto.claim_asset(pp_string);
 
         vm.prank(test_wallet_2);
         vm.expectRevert("Passphrase not exist");
-        easySendCrypto.claim_asset(bytes32(uint256(50)));
+        easySendCrypto.claim_asset("test2");
 
         vm.warp(20000);
         vm.prank(test_wallet_2);
         vm.expectRevert("Swap expired");
-        easySendCrypto.claim_asset(bytes32(uint256(100)));
+        easySendCrypto.claim_asset(pp_string);
 
         vm.warp(100);
 
         vm.prank(test_wallet_2);
-        easySendCrypto.claim_asset(bytes32(uint256(100)));
+        easySendCrypto.claim_asset(pp_string);
 
         assertEq(
             testERC20.balanceOf(test_wallet_1) - test_wallet_1_erc20_balance,
@@ -197,12 +203,15 @@ contract EasySendCryptoTest is Test {
         uint256 test_wallet_2_balance = test_wallet_2.balance;
         uint256 fee_collect_addr_balance = fee_collect_address.balance;
 
+        string memory pp_string = "test";
+        bytes32 pp = keccak256(abi.encodePacked(pp_string));
+
         // add a transfer order
         vm.prank(test_wallet_1);
         easySendCrypto.add_order{value: 1 ether}(
             address(0),
             1 ether,
-            bytes32(uint256(100)),
+            pp,
             test_wallet_2,
             false,
             address(0),
@@ -215,10 +224,10 @@ contract EasySendCryptoTest is Test {
 
         vm.prank(test_wallet_2);
         vm.expectRevert("Not allow retrieve asset");
-        easySendCrypto.retrieve_unclaimed_order(bytes32(uint256(50)));
+        easySendCrypto.retrieve_unclaimed_order(pp);
 
         vm.prank(test_wallet_1);
-        easySendCrypto.retrieve_unclaimed_order(bytes32(uint256(100)));
+        easySendCrypto.retrieve_unclaimed_order(pp);
 
         assertEq(test_wallet_1_balance - test_wallet_1.balance, 0);
         assertEq(address(easySendCrypto).balance, 0);

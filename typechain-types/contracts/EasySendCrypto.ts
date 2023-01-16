@@ -32,13 +32,15 @@ export interface EasySendCryptoInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "add_order(address,uint256,bytes32,address,bool,address,uint256,uint256)": FunctionFragment;
-    "claim_asset(bytes32)": FunctionFragment;
+    "claim_asset(string)": FunctionFragment;
     "count()": FunctionFragment;
     "fee_collect_address()": FunctionFragment;
     "fee_rate()": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
+    "initialize(uint256,address)": FunctionFragment;
+    "is_passphrase_unique(bytes32)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "retrieve_unclaimed_order(bytes32)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
@@ -58,6 +60,8 @@ export interface EasySendCryptoInterface extends utils.Interface {
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
+      | "initialize"
+      | "is_passphrase_unique"
       | "renounceRole"
       | "retrieve_unclaimed_order"
       | "revokeRole"
@@ -85,7 +89,7 @@ export interface EasySendCryptoInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claim_asset",
-    values: [PromiseOrValue<BytesLike>]
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "count", values?: undefined): string;
   encodeFunctionData(
@@ -104,6 +108,14 @@ export interface EasySendCryptoInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "hasRole",
     values: [PromiseOrValue<BytesLike>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "is_passphrase_unique",
+    values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceRole",
@@ -151,6 +163,11 @@ export interface EasySendCryptoInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "is_passphrase_unique",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "renounceRole",
     data: BytesLike
@@ -175,7 +192,8 @@ export interface EasySendCryptoInterface extends utils.Interface {
 
   events: {
     "Data(bytes)": EventFragment;
-    "New_Order(uint256,address,uint256,address,address,bool,address,uint256,uint256)": EventFragment;
+    "Initialized(uint8)": EventFragment;
+    "New_Order(uint256,address,uint256,bytes32,address,address,bool,address,uint256,uint256)": EventFragment;
     "Order_Cancelled(uint256)": EventFragment;
     "Order_Completed(uint256)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
@@ -184,6 +202,7 @@ export interface EasySendCryptoInterface extends utils.Interface {
   };
 
   getEvent(nameOrSignatureOrTopic: "Data"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "New_Order"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Order_Cancelled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Order_Completed"): EventFragment;
@@ -199,10 +218,18 @@ export type DataEvent = TypedEvent<[string], DataEventObject>;
 
 export type DataEventFilter = TypedEventFilter<DataEvent>;
 
+export interface InitializedEventObject {
+  version: number;
+}
+export type InitializedEvent = TypedEvent<[number], InitializedEventObject>;
+
+export type InitializedEventFilter = TypedEventFilter<InitializedEvent>;
+
 export interface New_OrderEventObject {
   id: BigNumber;
   token_address: string;
   amount: BigNumber;
+  passphrase: string;
   sender: string;
   receiver: string;
   is_swap: boolean;
@@ -215,6 +242,7 @@ export type New_OrderEvent = TypedEvent<
     BigNumber,
     string,
     BigNumber,
+    string,
     string,
     string,
     boolean,
@@ -326,7 +354,7 @@ export interface EasySendCrypto extends BaseContract {
     ): Promise<ContractTransaction>;
 
     claim_asset(
-      passphrase: PromiseOrValue<BytesLike>,
+      passphrase_string: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -350,6 +378,17 @@ export interface EasySendCrypto extends BaseContract {
     hasRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    initialize(
+      _fee_rate: PromiseOrValue<BigNumberish>,
+      _fee_collect_address: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    is_passphrase_unique(
+      passphrase: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
@@ -401,7 +440,7 @@ export interface EasySendCrypto extends BaseContract {
   ): Promise<ContractTransaction>;
 
   claim_asset(
-    passphrase: PromiseOrValue<BytesLike>,
+    passphrase_string: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -425,6 +464,17 @@ export interface EasySendCrypto extends BaseContract {
   hasRole(
     role: PromiseOrValue<BytesLike>,
     account: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  initialize(
+    _fee_rate: PromiseOrValue<BigNumberish>,
+    _fee_collect_address: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  is_passphrase_unique(
+    passphrase: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -476,7 +526,7 @@ export interface EasySendCrypto extends BaseContract {
     ): Promise<void>;
 
     claim_asset(
-      passphrase: PromiseOrValue<BytesLike>,
+      passphrase_string: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -500,6 +550,17 @@ export interface EasySendCrypto extends BaseContract {
     hasRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    initialize(
+      _fee_rate: PromiseOrValue<BigNumberish>,
+      _fee_collect_address: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    is_passphrase_unique(
+      passphrase: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
@@ -540,10 +601,14 @@ export interface EasySendCrypto extends BaseContract {
     "Data(bytes)"(data?: null): DataEventFilter;
     Data(data?: null): DataEventFilter;
 
-    "New_Order(uint256,address,uint256,address,address,bool,address,uint256,uint256)"(
+    "Initialized(uint8)"(version?: null): InitializedEventFilter;
+    Initialized(version?: null): InitializedEventFilter;
+
+    "New_Order(uint256,address,uint256,bytes32,address,address,bool,address,uint256,uint256)"(
       id?: null,
       token_address?: null,
       amount?: null,
+      passphrase?: null,
       sender?: null,
       receiver?: null,
       is_swap?: null,
@@ -555,6 +620,7 @@ export interface EasySendCrypto extends BaseContract {
       id?: null,
       token_address?: null,
       amount?: null,
+      passphrase?: null,
       sender?: null,
       receiver?: null,
       is_swap?: null,
@@ -619,7 +685,7 @@ export interface EasySendCrypto extends BaseContract {
     ): Promise<BigNumber>;
 
     claim_asset(
-      passphrase: PromiseOrValue<BytesLike>,
+      passphrase_string: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -643,6 +709,17 @@ export interface EasySendCrypto extends BaseContract {
     hasRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    initialize(
+      _fee_rate: PromiseOrValue<BigNumberish>,
+      _fee_collect_address: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    is_passphrase_unique(
+      passphrase: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -697,7 +774,7 @@ export interface EasySendCrypto extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     claim_asset(
-      passphrase: PromiseOrValue<BytesLike>,
+      passphrase_string: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -723,6 +800,17 @@ export interface EasySendCrypto extends BaseContract {
     hasRole(
       role: PromiseOrValue<BytesLike>,
       account: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    initialize(
+      _fee_rate: PromiseOrValue<BigNumberish>,
+      _fee_collect_address: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    is_passphrase_unique(
+      passphrase: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -20,6 +20,8 @@ artifacts
 typechain
 typechain-types
 
+# test contract
+contracts/Safu.sol
 
 # Dotenv file
 .env
