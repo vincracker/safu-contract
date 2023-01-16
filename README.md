@@ -1,18 +1,20 @@
-# Sample Hardhat Project
+# EasySendCrypto Contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
 
-Try running some of the following tasks:
-
+## Compile and deploy the contract
 ```shell
-npx hardhat help
 npx hardhat compile
-npx hardhat node
 npx hardhat run scripts/deploy.ts
 ```
 
 
+## Run the test on local devnet
 ```shell
 forge install
 forge test
+```
+
+### To see test coverage:
+```shell
+forge coverage
 ```
