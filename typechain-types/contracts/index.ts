@@ -3,5 +3,6 @@
 /* eslint-disable */
 import type * as erc20Sol from "./ERC20.sol";
 export type { erc20Sol };
-export type { EasySendCrypto } from "./EasySendCrypto";
-export type { Safu } from "./Safu";
+import type * as safuSol from "./Safu.sol";
+export type { safuSol };
+export type { EasySendCryptoUpgradeable } from "./EasySendCryptoUpgradeable";

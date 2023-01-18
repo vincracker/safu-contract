@@ -69,113 +69,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "AccessControl",
+      name: "EasySendCryptoUpgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AccessControl__factory>;
-    getContractFactory(
-      name: "AccessControlUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AccessControlUpgradeable__factory>;
-    getContractFactory(
-      name: "ContextUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ContextUpgradeable__factory>;
-    getContractFactory(
-      name: "EasySendCrypto",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.EasySendCrypto__factory>;
+    ): Promise<Contracts.EasySendCryptoUpgradeable__factory>;
     getContractFactory(
       name: "ERC20Token",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC20Token__factory>;
     getContractFactory(
-      name: "Safu",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Safu__factory>;
-    getContractFactory(
       name: "EasySendCrypto",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EasySendCrypto__factory>;
-    getContractFactory(
-      name: "EasySendCryptoTest",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.EasySendCryptoTest__factory>;
-    getContractFactory(
-      name: "ERC165",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC165__factory>;
-    getContractFactory(
-      name: "ERC165Upgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC165Upgradeable__factory>;
-    getContractFactory(
-      name: "ERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20__factory>;
-    getContractFactory(
-      name: "ERC20Token",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20Token__factory>;
-    getContractFactory(
-      name: "IAccessControl",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IAccessControl__factory>;
-    getContractFactory(
-      name: "IAccessControlUpgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IAccessControlUpgradeable__factory>;
-    getContractFactory(
-      name: "IERC165",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC165__factory>;
-    getContractFactory(
-      name: "IERC165Upgradeable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC165Upgradeable__factory>;
-    getContractFactory(
-      name: "IERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20__factory>;
-    getContractFactory(
-      name: "IERC20Metadata",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20Metadata__factory>;
-    getContractFactory(
-      name: "Initializable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Initializable__factory>;
-    getContractFactory(
-      name: "Ownable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Ownable__factory>;
-    getContractFactory(
-      name: "StdAssertions",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.StdAssertions__factory>;
-    getContractFactory(
-      name: "StdError",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.StdError__factory>;
-    getContractFactory(
-      name: "StdStorageSafe",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.StdStorageSafe__factory>;
-    getContractFactory(
-      name: "DSTest",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.DSTest__factory>;
-    getContractFactory(
-      name: "Test",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Test__factory>;
-    getContractFactory(
-      name: "Vm",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Vm__factory>;
-    getContractFactory(
-      name: "VmSafe",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VmSafe__factory>;
 
     getContractAt(
       name: "AccessControlUpgradeable",
@@ -248,140 +152,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "AccessControl",
+      name: "EasySendCryptoUpgradeable",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.AccessControl>;
-    getContractAt(
-      name: "AccessControlUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AccessControlUpgradeable>;
-    getContractAt(
-      name: "ContextUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ContextUpgradeable>;
-    getContractAt(
-      name: "EasySendCrypto",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.EasySendCrypto>;
+    ): Promise<Contracts.EasySendCryptoUpgradeable>;
     getContractAt(
       name: "ERC20Token",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC20Token>;
     getContractAt(
-      name: "Safu",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Safu>;
-    getContractAt(
       name: "EasySendCrypto",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.EasySendCrypto>;
-    getContractAt(
-      name: "EasySendCryptoTest",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.EasySendCryptoTest>;
-    getContractAt(
-      name: "ERC165",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC165>;
-    getContractAt(
-      name: "ERC165Upgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC165Upgradeable>;
-    getContractAt(
-      name: "ERC20",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20>;
-    getContractAt(
-      name: "ERC20Token",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20Token>;
-    getContractAt(
-      name: "IAccessControl",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IAccessControl>;
-    getContractAt(
-      name: "IAccessControlUpgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IAccessControlUpgradeable>;
-    getContractAt(
-      name: "IERC165",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC165>;
-    getContractAt(
-      name: "IERC165Upgradeable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC165Upgradeable>;
-    getContractAt(
-      name: "IERC20",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC20>;
-    getContractAt(
-      name: "IERC20Metadata",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC20Metadata>;
-    getContractAt(
-      name: "Initializable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Initializable>;
-    getContractAt(
-      name: "Ownable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Ownable>;
-    getContractAt(
-      name: "StdAssertions",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.StdAssertions>;
-    getContractAt(
-      name: "StdError",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.StdError>;
-    getContractAt(
-      name: "StdStorageSafe",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.StdStorageSafe>;
-    getContractAt(
-      name: "DSTest",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.DSTest>;
-    getContractAt(
-      name: "Test",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Test>;
-    getContractAt(
-      name: "Vm",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Vm>;
-    getContractAt(
-      name: "VmSafe",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VmSafe>;
 
     // default types
     getContractFactory(

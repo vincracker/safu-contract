@@ -2,5 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as erc20Sol from "./ERC20.sol";
-export { EasySendCrypto__factory } from "./EasySendCrypto__factory";
-export { Safu__factory } from "./Safu__factory";
+export * as safuSol from "./Safu.sol";
+export { EasySendCryptoUpgradeable__factory } from "./EasySendCryptoUpgradeable__factory";

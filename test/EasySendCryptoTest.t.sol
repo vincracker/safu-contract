@@ -2,11 +2,11 @@
 pragma solidity ^0.8.13;
 
 import "../lib/forge-std/src/Test.sol";
-import "../contracts/EasySendCrypto.sol";
+import "../contracts/EasySendCryptoUpgradeable.sol";
 import "../contracts/ERC20.sol";
 
 contract EasySendCryptoTest is Test {
-    EasySendCrypto public easySendCrypto;
+    EasySendCryptoUpgradeable public easySendCrypto;
     ERC20Token public testERC20;
 
     address fee_collect_address = 0x99dbB9D1A7FFd38467F94443a9dEe088c6AB34B9;
@@ -14,7 +14,7 @@ contract EasySendCryptoTest is Test {
     address test_wallet_2 = 0x63C99dc287157dc8BFF689BcC3Fa88435eE131A4;
 
     function setUp() public {
-        easySendCrypto = new EasySendCrypto();
+        easySendCrypto = new EasySendCryptoUpgradeable();
         easySendCrypto.initialize(10, fee_collect_address);
         testERC20 = new ERC20Token();
     }
