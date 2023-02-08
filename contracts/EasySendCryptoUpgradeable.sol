@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity 0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
@@ -22,7 +22,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     uint256 public count;
     uint256 public fee_rate;
     address public fee_collect_address;
-    mapping(bytes32 => Order) orders_mapping;
+    mapping(bytes32 => Order) private orders_mapping;
 
     event New_Order(
         uint256 id,
@@ -65,6 +65,11 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         __Context_init();
         __ERC165_init();
 
+        require(
+            _fee_collect_address != address(0),
+            "Cannot set fee_collect_address to 0"
+        );
+
         fee_rate = _fee_rate;
         fee_collect_address = _fee_collect_address;
 
@@ -79,6 +84,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         external
         onlyAdmin
     {
+        require(
+            _fee_collect_address != address(0),
+            "Cannot set fee_collect_address to 0"
+        );
         fee_collect_address = _fee_collect_address;
     }
 
@@ -230,7 +239,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
             IERC20 token = IERC20(token_address);
             require(token.balanceOf(from) >= amount, "Insufficient balance");
             bool res = token.transferFrom(from, to, amount);
-            require(res == true, "TransferFrom failed");
+            require(res, "TransferFrom failed");
         }
     }
 
@@ -250,7 +259,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
                 "Insufficient balance"
             );
             bool res = token.transfer(to, amount);
-            require(res == true, "Transfer failed");
+            require(res, "Transfer failed");
         }
     }
 }
