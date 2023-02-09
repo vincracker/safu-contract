@@ -21,8 +21,10 @@ struct Order {
 contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     uint256 public count;
     uint256 public fee_rate;
+    uint256 public fee_collect_cap;
     address public fee_collect_address;
-    mapping(bytes32 => Order) private orders_mapping;
+    mapping(bytes32 => Order) orders_mapping;
+    address[] public stable_coins;
 
     event New_Order(
         uint256 id,
@@ -57,10 +59,12 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     //     _disableInitializers();
     // }
 
-    function initialize(uint256 _fee_rate, address _fee_collect_address)
-        public
-        initializer
-    {
+    function initialize(
+        uint256 _fee_rate,
+        address _fee_collect_address,
+        uint256 _fee_collect_cap,
+        address[] memory _stable_coins
+    ) public initializer {
         __AccessControl_init();
         __Context_init();
         __ERC165_init();
@@ -72,6 +76,8 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
 
         fee_rate = _fee_rate;
         fee_collect_address = _fee_collect_address;
+        fee_collect_cap = _fee_collect_cap;
+        stable_coins = _stable_coins;
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -80,13 +86,34 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         fee_rate = _new_fee_rate;
     }
 
+    function set_fee_collect_cap(uint256 _new_fee_collect_cap)
+        external
+        onlyAdmin
+    {
+        require(_new_fee_collect_cap != 0, "Cannot set fee_collect_cap to 0");
+        fee_collect_cap = _new_fee_collect_cap;
+    }
+
+    function set_stable_coins(address[] memory _stable_coins)
+        external
+        onlyAdmin
+    {
+        for (uint256 i = 0; i < _stable_coins.length; i++) {
+            require(
+                _stable_coins[i] != address(0),
+                "Invalid stable coin address"
+            );
+        }
+        stable_coins = _stable_coins;
+    }
+
     function set_fee_collect_address(address _fee_collect_address)
         external
         onlyAdmin
     {
         require(
             _fee_collect_address != address(0),
-            "Cannot set fee_collect_address to 0"
+            "Cannot set fee_collect_address to null address"
         );
         fee_collect_address = _fee_collect_address;
     }
@@ -166,7 +193,11 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
                 "Swap expired"
             );
             uint256 swap_collect_fee = ((unclaimed_order.swap_amount *
-                fee_rate) / 100);
+                fee_rate) / 10000);
+
+            if (is_stable_coin(unclaimed_order.swap_token_address)) {
+                swap_collect_fee = 1000000000000000000000; //1000 stable coins
+            }
 
             _transfer_token_from(
                 payable(msg.sender),
@@ -183,7 +214,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
             );
         }
 
-        uint256 collect_fee = ((unclaimed_order.amount * fee_rate) / 100);
+        uint256 collect_fee = ((unclaimed_order.amount * fee_rate) / 10000);
+        if (is_stable_coin(unclaimed_order.token_address)) {
+            collect_fee = 1000000000000000000000; //1000 stable coins
+        }
         _transfer_token_to(
             payable(fee_collect_address),
             collect_fee,
@@ -225,6 +259,15 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         } else {
             return false;
         }
+    }
+
+    function is_stable_coin(address token_address) public view returns (bool) {
+        for (uint256 i = 0; i < stable_coins.length; i++) {
+            if (stable_coins[i] == token_address) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function _transfer_token_from(
