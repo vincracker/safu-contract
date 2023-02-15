@@ -25,6 +25,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     address public fee_collect_address;
     mapping(bytes32 => Order) orders_mapping;
     address[] public stable_coins;
+    uint256 stable_coins_fee_limit;
 
     uint16 constant FEE_RATE_BASE = 10000;
 
@@ -58,15 +59,17 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     }
 
     /// @notice The contract Initializer
-    /// @param _fee_rate The uint16 number for fee rate (0-10000)
+    /// @param _fee_rate The uint16 number for fee rate (0 ~ 10000) (10000 = 100%)
     /// @param _fee_collect_address The address receive fee
-    /// @param _fee_collect_cap The maximum amount of fee can be collected if the swaping/transfering ERC20 token is stable coin
+    /// @param _fee_collect_cap The maximum amount of fee can be collected if the swaping/transfering  token is stable coin
     /// @param _stable_coins The array of address of stable coins
+    /// @param _stable_coins_fee_limit The maximum amount of fee can be collected if the swaping/transfering token is stable coin (1000)
     function initialize(
         uint16 _fee_rate,
         address _fee_collect_address,
         uint256 _fee_collect_cap,
-        address[] memory _stable_coins
+        address[] memory _stable_coins,
+        uint256 _stable_coins_fee_limit
     ) public initializer {
         __AccessControl_init();
         __Context_init();
@@ -85,6 +88,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         fee_collect_address = _fee_collect_address;
         fee_collect_cap = _fee_collect_cap;
         stable_coins = _stable_coins;
+        stable_coins_fee_limit = _stable_coins_fee_limit;
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -149,7 +153,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     /// @param _receiver The address of the order receiver
     /// @param _is_swap The swap flag of the order
     /// @param _swap_token_address The token address of the order receiver send
-    /// @param _swap_amount The amount of ERC20 token to be sent from receiver (0 if is_swap is false)
+    /// @param _swap_amount The amount of token to be sent from receiver (0 if is_swap is false)
     /// @param _swap_deadline The swap deadline of the order (0 if is_swap is false)
     function add_order(
         address _token_address,
@@ -250,10 +254,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
             uint256 swap_collect_fee = ((unclaimed_order.swap_amount *
                 fee_rate) / FEE_RATE_BASE);
 
-            // if the token is stable coin, the fee is limited to 1000 stable coins
+            // if the token is stable coin, the fee set to stable_coins_fee_limit
             if (is_stable_coin(unclaimed_order.token_address)) {
-                if (swap_collect_fee > 1000000000000000000000) {
-                    swap_collect_fee = 1000000000000000000000; //1000 stable coins
+                if (swap_collect_fee > stable_coins_fee_limit) {
+                    swap_collect_fee = stable_coins_fee_limit;
                 }
             }
 
@@ -278,10 +282,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         uint256 collect_fee = ((unclaimed_order.amount * fee_rate) /
             FEE_RATE_BASE);
 
-        // if the token is stable coin, the fee is limited to 1000 stable coins
+        // if the token is stable coin, the fee set to stable_coins_fee_limit
         if (is_stable_coin(unclaimed_order.token_address)) {
-            if (collect_fee > 1000000000000000000000) {
-                collect_fee = 1000000000000000000000; //1000 stable coins
+            if (collect_fee > stable_coins_fee_limit) {
+                collect_fee = stable_coins_fee_limit;
             }
         }
         // Send the fee to fee_collect_address
@@ -352,10 +356,16 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         address token_address
     ) internal {
         if (token_address == address(0)) {
-            require(msg.value == amount, "EasySendCryptoUpgradeable.sol: Amount and value not match");
+            require(
+                msg.value == amount,
+                "EasySendCryptoUpgradeable.sol: Amount and value not match"
+            );
         } else {
             IERC20 token = IERC20(token_address);
-            require(token.balanceOf(from) >= amount, "EasySendCryptoUpgradeable.sol: Insufficient balance");
+            require(
+                token.balanceOf(from) >= amount,
+                "EasySendCryptoUpgradeable.sol: Insufficient balance"
+            );
             bool res = token.transferFrom(from, to, amount);
             require(res, "EasySendCryptoUpgradeable.sol: TransferFrom failed");
         }
@@ -369,7 +379,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     ) internal {
         if (token_address == address(0)) {
             (bool sent, bytes memory data) = to.call{value: amount}("");
-            require(sent, "EasySendCryptoUpgradeable.sol: Failed to send Ether");
+            require(
+                sent,
+                "EasySendCryptoUpgradeable.sol: Failed to send Ether"
+            );
             emit Data(data);
         } else {
             IERC20 token = IERC20(token_address);
