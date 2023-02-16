@@ -25,7 +25,6 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     address public fee_collect_address;
     mapping(bytes32 => Order) orders_mapping;
     address[] public stable_coins;
-    uint256 stable_coins_fee_limit;
 
     uint16 constant FEE_RATE_BASE = 10000;
 
@@ -63,13 +62,11 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     /// @param _fee_collect_address The address receive fee
     /// @param _fee_collect_cap The maximum amount of fee can be collected if the swaping/transfering  token is stable coin
     /// @param _stable_coins The array of address of stable coins
-    /// @param _stable_coins_fee_limit The maximum amount of fee can be collected if the swaping/transfering token is stable coin (1000)
     function initialize(
         uint16 _fee_rate,
         address _fee_collect_address,
         uint256 _fee_collect_cap,
-        address[] memory _stable_coins,
-        uint256 _stable_coins_fee_limit
+        address[] memory _stable_coins
     ) public initializer {
         __AccessControl_init();
         __Context_init();
@@ -88,7 +85,6 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         fee_collect_address = _fee_collect_address;
         fee_collect_cap = _fee_collect_cap;
         stable_coins = _stable_coins;
-        stable_coins_fee_limit = _stable_coins_fee_limit;
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -254,10 +250,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
             uint256 swap_collect_fee = ((unclaimed_order.swap_amount *
                 fee_rate) / FEE_RATE_BASE);
 
-            // if the token is stable coin, the fee set to stable_coins_fee_limit
+            // if the token is stable coin, the fee set to fee_collect_cap
             if (is_stable_coin(unclaimed_order.token_address)) {
-                if (swap_collect_fee > stable_coins_fee_limit) {
-                    swap_collect_fee = stable_coins_fee_limit;
+                if (swap_collect_fee > fee_collect_cap) {
+                    swap_collect_fee = fee_collect_cap;
                 }
             }
 
@@ -282,10 +278,10 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         uint256 collect_fee = ((unclaimed_order.amount * fee_rate) /
             FEE_RATE_BASE);
 
-        // if the token is stable coin, the fee set to stable_coins_fee_limit
+        // if the token is stable coin, the fee set to fee_collect_cap
         if (is_stable_coin(unclaimed_order.token_address)) {
-            if (collect_fee > stable_coins_fee_limit) {
-                collect_fee = stable_coins_fee_limit;
+            if (collect_fee > fee_collect_cap) {
+                collect_fee = fee_collect_cap;
             }
         }
         // Send the fee to fee_collect_address
