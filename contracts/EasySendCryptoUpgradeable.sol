@@ -53,9 +53,9 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
         _;
     }
 
-    constructor() {
-        _disableInitializers();
-    }
+    // constructor() {
+    //     _disableInitializers();
+    // }
 
     /// @notice The contract Initializer
     /// @param _fee_rate The uint16 number for fee rate (0 ~ 10000) (10000 = 100%)
@@ -217,7 +217,7 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     /// @notice The function for user to claim or swap tokens. The is_swap flag is used to determine the order type.
     /// @notice Receiver need to privide the original passphrase string to claim the tokens.
     /// @param passphrase_string The original passphrase string of the order passphrase hash
-    function claim_asset(string memory passphrase_string) external {
+    function claim_asset(string memory passphrase_string) external payable {
         // Hash the passphrase string
         bytes32 passphrase_hash = keccak256(
             abi.encodePacked(passphrase_string)
@@ -353,9 +353,16 @@ contract EasySendCryptoUpgradeable is Initializable, AccessControlUpgradeable {
     ) internal {
         if (token_address == address(0)) {
             require(
-                msg.value == amount,
-                "EasySendCryptoUpgradeable.sol: Amount and value not match"
+                msg.value >= amount,
+                "EasySendCryptoUpgradeable.sol: Invalid amount"
             );
+            if (to != address(this)) {
+                require(
+                    address(this).balance >= amount,
+                    "EasySendCryptoUpgradeable.sol: Insufficient balance"
+                );
+                payable(to).transfer(amount);
+            }
         } else {
             IERC20 token = IERC20(token_address);
             require(
